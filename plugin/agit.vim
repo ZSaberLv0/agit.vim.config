@@ -4,6 +4,25 @@ let g:agit_ignore_spaces = 0
 let g:agit_log_width = 1024
 let g:agit_stat_width = 1024
 
+function! AGIT_unshallow()
+    redraw!
+    echo 'unable to parse rev, perform `git fetch --unshallow`?'
+    echo '  (y)es'
+    echo '  (n)o'
+    echo 'choose: '
+    let cmd = getchar()
+    if cmd != char2nr('y')
+        redraw! | echo 'canceled'
+        return
+    endif
+    redraw! | echo 'updating...'
+    call system('git fetch --unshallow')
+    call system('git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"')
+    call system('git fetch origin')
+    execute "normal \<Plug>(agit-reload)"
+    redraw! echo 'update finished'
+endfunction
+
 function! AGIT_main(path)
     if isdirectory(a:path)
         let path = substitute(a:path, '\\', '/', 'g')
@@ -57,30 +76,16 @@ function! AGIT_file_open()
     try
         silent! execute "normal \<Plug>(agit-diff)"
     endtry
-    if tabpagenr('$') != tabCount
-        execute "normal! \<c-w>h"
-        nnoremap <buffer><silent> q :call AGIT_diffBuf_quit()<cr>
-        execute "normal! \<c-w>l"
-        nnoremap <buffer><silent> q :call AGIT_diffBuf_quit()<cr>
-        normal! ]czz
+    if tabpagenr('$') <= tabCount
+        call AGIT_unshallow()
         return
     endif
-    redraw!
-    echo 'unable to parse rev, perform `git fetch --unshallow`?'
-    echo '  (y)es'
-    echo '  (n)o'
-    echo 'choose: '
-    let cmd = getchar()
-    if cmd != char2nr('y')
-        redraw! | echo 'canceled'
-        return
-    endif
-    redraw! | echo 'updating...'
-    call system('git fetch --unshallow')
-    call system('git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"')
-    call system('git fetch origin')
-    execute "normal \<Plug>(agit-reload)"
-    redraw! echo 'update finished'
+
+    execute "normal! \<c-w>h"
+    nnoremap <buffer><silent> q :call AGIT_diffBuf_quit()<cr>
+    execute "normal! \<c-w>l"
+    nnoremap <buffer><silent> q :call AGIT_diffBuf_quit()<cr>
+    normal! ]czz
 endfunction
 
 function! AGIT_diffBuf_askWrite()
@@ -126,12 +131,15 @@ function! AGIT_stat_open()
 
     let wildignore = &wildignore
     set wildignore=
-    call agit#diff#sidebyside(t:git, AGIT_stat_getCurFile(), '')
+    try
+        silent! call agit#diff#sidebyside(t:git, AGIT_stat_getCurFile(), '')
+    endtry
     let &wildignore = wildignore
-
     if tabpagenr('$') <= tabCount
+        call AGIT_unshallow()
         return
     endif
+
     execute "normal! \<c-w>h"
     nnoremap <buffer><silent> q :call AGIT_diffBuf_quit()<cr>
     execute "normal! \<c-w>l"
