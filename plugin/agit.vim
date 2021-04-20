@@ -28,9 +28,10 @@ function! AGIT_fixEndl()
     if &modifiable
         return
     endif
-    set modifiable
+    setlocal modifiable
     silent! %s/\r//g
-    set nomodifiable
+    setlocal nomodified
+    setlocal nomodifiable
 endfunction
 
 function! AGIT_main(path)
