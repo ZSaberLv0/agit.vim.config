@@ -23,6 +23,16 @@ function! AGIT_unshallow()
     redraw! echo 'update finished'
 endfunction
 
+function! AGIT_fixEndl()
+    " when file is dos endl, the history file may have `^M`
+    if &modifiable
+        return
+    endif
+    set modifiable
+    silent! %s/\r//g
+    set nomodifiable
+endfunction
+
 function! AGIT_main(path)
     if isdirectory(a:path)
         let path = substitute(a:path, '\\', '/', 'g')
@@ -83,8 +93,10 @@ function! AGIT_file_open()
 
     execute "normal! \<c-w>h"
     nnoremap <buffer><silent> q :call AGIT_diffBuf_quit()<cr>
+    call AGIT_fixEndl()
     execute "normal! \<c-w>l"
     nnoremap <buffer><silent> q :call AGIT_diffBuf_quit()<cr>
+    call AGIT_fixEndl()
     normal! ]czz
 endfunction
 
@@ -142,8 +154,10 @@ function! AGIT_stat_open()
 
     execute "normal! \<c-w>h"
     nnoremap <buffer><silent> q :call AGIT_diffBuf_quit()<cr>
+    call AGIT_fixEndl()
     execute "normal! \<c-w>l"
     nnoremap <buffer><silent> q :call AGIT_diffBuf_quit()<cr>
+    call AGIT_fixEndl()
     normal! ]czz
 endfunction
 function! AGIT_log_printMsg()
