@@ -20,7 +20,7 @@ function! AGIT_unshallow()
     call system('git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"')
     call system('git fetch origin')
     execute "normal \<Plug>(agit-reload)"
-    redraw! echo 'update finished'
+    redraw! | echo 'update finished'
 endfunction
 
 function! AGIT_fixEndl()
@@ -86,6 +86,7 @@ function! AGIT_file_open()
     let diffResult = ''
     try
         silent! execute "normal \<Plug>(agit-diff)"
+    catch
     endtry
     if tabpagenr('$') <= tabCount
         call AGIT_unshallow()
@@ -146,6 +147,7 @@ function! AGIT_stat_open()
     set wildignore=
     try
         silent! call agit#diff#sidebyside(t:git, AGIT_stat_getCurFile(), '')
+    catch
     endtry
     let &wildignore = wildignore
     if tabpagenr('$') <= tabCount
