@@ -229,6 +229,7 @@ augroup AGIT_augroup
     autocmd FileType agit,agit_stat,agit_diff
                 \  nmap <silent><buffer> q <Plug>(agit-exit)
                 \| nmap <silent><buffer> DD <Plug>(agit-reload)
+                \| setlocal cursorline
     autocmd FileType agit
                 \  nmap <silent><buffer> p :call AGIT_log_printMsg()<cr>
                 \| nmap <silent><buffer> cc :call AGIT_log_checkout()<cr>
