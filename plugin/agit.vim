@@ -201,14 +201,17 @@ function! AGIT_stat_delete()
     endif
     echo 'delete `' . file . '` ?'
     echo '  (y)es'
+    if exists('*ZFBackupSave')
+        echo '    (Y)es without backup'
+    endif
     echo '  (n)o'
     echo 'choose: '
     let cmd = getchar()
-    if cmd != char2nr('y')
+    if cmd != char2nr('y') && cmd != char2nr('Y')
         redraw!
         return
     endif
-    if exists('*ZFBackupSave')
+    if exists('*ZFBackupSave') && cmd != char2nr('Y')
         call ZFBackupSave(file)
     endif
     if isdirectory(file)
