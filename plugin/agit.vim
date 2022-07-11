@@ -3,7 +3,12 @@ let g:agit_no_default_mappings = 1
 let g:agit_ignore_spaces = 0
 let g:agit_log_width = 1024
 let g:agit_stat_width = 1024
+
+" ============================================================
 let g:agit_max_log_lines = 99999999
+let s:pluginPath = fnamemodify(expand('<sfile>'), ':p:h:h')
+execute 'source ' . fnameescape(s:pluginPath . '/autoload/agit/aligner.vim')
+" ============================================================
 
 function! AGIT_unshallow()
     redraw!
@@ -36,6 +41,7 @@ function! AGIT_fixEndl()
 endfunction
 
 function! AGIT_main(path)
+    execute 'source ' . fnameescape(s:pluginPath . '/autoload/agit/aligner.vim')
     if isdirectory(a:path)
         let path = substitute(a:path, '\\', '/', 'g')
         let path = substitute(path, ' ', '\\ ', 'g')
