@@ -3,6 +3,7 @@ let g:agit_no_default_mappings = 1
 let g:agit_ignore_spaces = 0
 let g:agit_log_width = 1024
 let g:agit_stat_width = 1024
+let g:agit_max_log_lines = 99999999
 
 function! AGIT_unshallow()
     redraw!
