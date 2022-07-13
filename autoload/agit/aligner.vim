@@ -9,8 +9,9 @@ function! agit#aligner#align(table, max_col, ...)
         for item in items
             if empty(line)
                 let line = item
-                if len(line) < align
-                    let line .= repeat(' ', align - len(line))
+                let lineWidth = strdisplaywidth(line)
+                if lineWidth < align
+                    let line .= repeat(' ', align - lineWidth)
                 else
                     let line .= '  '
                 endif
