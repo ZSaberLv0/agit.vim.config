@@ -10,23 +10,30 @@ let s:pluginPath = fnamemodify(expand('<sfile>'), ':p:h:h')
 execute 'source ' . fnameescape(s:pluginPath . '/autoload/agit/aligner.vim')
 " ============================================================
 
-function! AGIT_unshallow()
-    redraw!
-    echo 'unable to parse rev, perform `git fetch --unshallow`?'
-    echo '  (y)es'
-    echo '  (n)o'
-    echo 'choose: '
-    let cmd = getchar()
-    if cmd != char2nr('y')
-        redraw! | echo 'canceled'
-        return
+" option: {
+"   'confirm' : 1/0,
+"   'message' : 'unable to parse rev, perform unshallow?',
+" }
+function! AGIT_unshallow(...)
+    let option = get(a:, 1, {})
+    if get(option, 'confirm', 1)
+        redraw!
+        echo get(option, 'message', 'unable to parse rev, perform unshallow?')
+        echo '  (y)es'
+        echo '  (n)o'
+        echo 'choose: '
+        let cmd = getchar()
+        if cmd != char2nr('y')
+            redraw! | echo 'canceled'
+            return
+        endif
     endif
-    redraw! | echo 'updating...'
+    redraw! | echo 'unshallow running...'
     call system('git fetch --unshallow')
     call system('git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"')
     call system('git fetch origin')
     execute "normal \<Plug>(agit-reload)"
-    redraw! | echo 'update finished'
+    redraw! | echo 'unshallow finished'
 endfunction
 
 function! AGIT_fixEndl()
@@ -239,6 +246,7 @@ augroup AGIT_augroup
     autocmd FileType agit,agit_stat,agit_diff
                 \  nmap <silent><buffer> q <Plug>(agit-exit)
                 \| nmap <silent><buffer> DD <Plug>(agit-reload)
+                \| nmap <silent><buffer> U :call AGIT_unshallow({'message':'perform unshallow?'})<cr>
                 \| setlocal cursorline
     autocmd FileType agit
                 \  nmap <silent><buffer> p :call AGIT_log_printMsg()<cr>
