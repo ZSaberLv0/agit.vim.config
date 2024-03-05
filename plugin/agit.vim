@@ -7,7 +7,11 @@ let g:agit_stat_width = 1024
 " ============================================================
 let g:agit_max_log_lines = 99999999
 let s:pluginPath = fnamemodify(expand('<sfile>'), ':p:h:h')
-execute 'source ' . fnameescape(s:pluginPath . '/autoload/agit/aligner.vim')
+function! s:updateImpl()
+    execute 'source ' . fnameescape(s:pluginPath . '/autoload/agit/aligner.vim')
+    execute 'source ' . fnameescape(s:pluginPath . '/autoload/agit/git.vim')
+endfunction
+call s:updateImpl()
 " ============================================================
 
 " option: {
@@ -48,7 +52,7 @@ function! AGIT_fixEndl()
 endfunction
 
 function! AGIT_main(path)
-    execute 'source ' . fnameescape(s:pluginPath . '/autoload/agit/aligner.vim')
+    call s:updateImpl()
     if isdirectory(a:path)
         let path = substitute(a:path, '\\', '/', 'g')
         let path = substitute(path, ' ', '\\ ', 'g')
@@ -64,6 +68,7 @@ function! AGIT_main(path)
 endfunction
 
 function! AGIT_file(path) abort
+    call s:updateImpl()
     let path = a:path
     if &filetype == 'agit_stat'
         let path = AGIT_stat_getCurFile()
