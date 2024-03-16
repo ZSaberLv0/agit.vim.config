@@ -65,6 +65,8 @@ function! AGIT_main(path)
     else
         execute 'Agit --dir=' . path
     endif
+
+    call AGIT_tmpStashCheck()
 endfunction
 
 function! AGIT_file(path) abort
@@ -153,6 +155,42 @@ function! AGIT_diffBuf_quit()
         execute "normal \<Plug>(agit-reload)"
     endif
 endfunction
+
+function! AGIT_tmpStashCheck()
+    if exists('*ZFGitTmpStash')
+        silent! let stash = ZFGitTmpStashList()
+        if !empty(stash)
+            echo 'NOTE: you have tmp stashes, use DP to pop, or DR to drop'
+            echo "\n"
+            call ZFGitTmpStashList()
+        endif
+    endif
+endfunction
+function! AGIT_tmpStash()
+    if !exists('*ZFGitTmpStash')
+        echo 'ZSaberLv0/ZFVimGitUtil is required to perform stash'
+        return
+    endif
+    call ZFGitTmpStash()
+    execute "normal \<Plug>(agit-reload)"
+endfunction
+function! AGIT_tmpStashPop()
+    if !exists('*ZFGitTmpStash')
+        echo 'ZSaberLv0/ZFVimGitUtil is required to perform stash pop'
+        return
+    endif
+    call ZFGitTmpStashPop()
+    execute "normal \<Plug>(agit-reload)"
+endfunction
+function! AGIT_tmpStashDrop()
+    if !exists('*ZFGitTmpStash')
+        echo 'ZSaberLv0/ZFVimGitUtil is required to perform stash drop'
+        return
+    endif
+    call ZFGitTmpStashDrop()
+    execute "normal \<Plug>(agit-reload)"
+endfunction
+
 function! AGIT_log_printMsg()
     let msg = ''
     let hash = agit#extract_hash(getline('.'))
@@ -245,7 +283,7 @@ function! AGIT_stat_delete()
     execute "normal \<Plug>(agit-reload)"
     redraw!
 endfunction
-function! AGIT_stat_stash()
+function! AGIT_stat_tmpStash()
     let file = AGIT_stat_getCurFile()
     if empty(file)
         return
@@ -267,7 +305,7 @@ function! AGIT_stat_stash()
         redraw!
     endif
     call ZFGitTmpStash(file)
-    silent! execute "normal \<Plug>(agit-reload)"
+    execute "normal \<Plug>(agit-reload)"
 endfunction
 
 augroup AGIT_augroup
@@ -276,6 +314,9 @@ augroup AGIT_augroup
                 \  nmap <silent><buffer> q <Plug>(agit-exit)
                 \| nmap <silent><buffer> DD <Plug>(agit-reload)
                 \| nmap <silent><buffer> U :call AGIT_unshallow({'message':'perform unshallow?'})<cr>
+                \| nmap <silent><buffer> DA :call AGIT_tmpStash()<cr>
+                \| nmap <silent><buffer> DP :call AGIT_tmpStashPop()<cr>
+                \| nmap <silent><buffer> DR :call AGIT_tmpStashDrop()<cr>
                 \| setlocal cursorline
     autocmd FileType agit
                 \  nmap <silent><buffer> p :call AGIT_log_printMsg()<cr>
@@ -284,7 +325,7 @@ augroup AGIT_augroup
                 \  nmap <silent><buffer> o :call AGIT_stat_open()<cr>
                 \| nmap <silent><buffer> <cr> :call AGIT_stat_open()<cr>
                 \| nmap <silent><buffer> DH :call AGIT_stat_checkout()<cr>
-                \| nmap <silent><buffer> DS :call AGIT_stat_stash()<cr>
+                \| nmap <silent><buffer> DS :call AGIT_stat_tmpStash()<cr>
                 \| nmap <silent><buffer> dd :call AGIT_stat_delete()<cr>
 augroup END
 
