@@ -153,6 +153,23 @@ function! AGIT_diffBuf_quit()
         execute "normal \<Plug>(agit-reload)"
     endif
 endfunction
+function! AGIT_log_printMsg()
+    let msg = ''
+    let hash = agit#extract_hash(getline('.'))
+    if hash != ''
+        let msg = agit#git#exec('show -s --format=format:%B ' . hash, getcwd())
+    endif
+    redraw!
+    echo msg
+    return msg
+endfunction
+function! AGIT_log_checkout()
+    let hash = agit#extract_hash(getline('.'))
+    if hash != ''
+        call agit#git#exec('checkout ' . hash, getcwd())
+        execute "normal \<Plug>(agit-reload)"
+    endif
+endfunction
 function! AGIT_stat_getCurFile()
     let file = getline('.')
     let file = substitute(file, '^ \+', '', '') " `^ +`
@@ -181,23 +198,6 @@ function! AGIT_stat_open()
     nnoremap <buffer><silent> q :call AGIT_diffBuf_quit()<cr>
     call AGIT_fixEndl()
     normal! ]czz
-endfunction
-function! AGIT_log_printMsg()
-    let msg = ''
-    let hash = agit#extract_hash(getline('.'))
-    if hash != ''
-        let msg = agit#git#exec('show -s --format=format:%B ' . hash, getcwd())
-    endif
-    redraw!
-    echo msg
-    return msg
-endfunction
-function! AGIT_log_checkout()
-    let hash = agit#extract_hash(getline('.'))
-    if hash != ''
-        call agit#git#exec('checkout ' . hash, getcwd())
-        execute "normal \<Plug>(agit-reload)"
-    endif
 endfunction
 function! AGIT_stat_checkout()
     let file = AGIT_stat_getCurFile()
@@ -245,6 +245,30 @@ function! AGIT_stat_delete()
     execute "normal \<Plug>(agit-reload)"
     redraw!
 endfunction
+function! AGIT_stat_stash()
+    let file = AGIT_stat_getCurFile()
+    if empty(file)
+        return
+    endif
+    if !exists('*ZFGitTmpStash')
+        echo 'ZSaberLv0/ZFVimGitUtil is required to perform stash'
+        return
+    endif
+    if 0
+        echo 'stash `' . file . '` ?'
+        echo '  (y)es'
+        echo '  (n)o'
+        echo 'choose: '
+        let cmd = getchar()
+        if cmd != char2nr('y') && cmd != char2nr('Y')
+            redraw!
+            return
+        endif
+        redraw!
+    endif
+    call ZFGitTmpStash(file)
+    silent! execute "normal \<Plug>(agit-reload)"
+endfunction
 
 augroup AGIT_augroup
     autocmd!
@@ -260,6 +284,7 @@ augroup AGIT_augroup
                 \  nmap <silent><buffer> o :call AGIT_stat_open()<cr>
                 \| nmap <silent><buffer> <cr> :call AGIT_stat_open()<cr>
                 \| nmap <silent><buffer> DH :call AGIT_stat_checkout()<cr>
+                \| nmap <silent><buffer> DS :call AGIT_stat_stash()<cr>
                 \| nmap <silent><buffer> dd :call AGIT_stat_delete()<cr>
 augroup END
 
