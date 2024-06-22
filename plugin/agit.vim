@@ -63,7 +63,9 @@ function! AGIT_main(path)
     if match(path, ' ') >= 0
         Agit
     else
-        execute 'Agit --dir=' . path
+        " without `--file`, would result to default `%`,
+        " which would cause `Agit: File not tracked:` if current opened file not tracked by git
+        execute printf('Agit --dir=%s --file=%s', path, path)
     endif
 
     call AGIT_tmpStashCheck()
