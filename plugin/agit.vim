@@ -8,8 +8,14 @@ let g:agit_stat_width = 1024
 let g:agit_max_log_lines = 99999999
 let s:pluginPath = fnamemodify(expand('<sfile>'), ':p:h:h')
 function! s:updateImpl()
-    execute 'source ' . fnameescape(s:pluginPath . '/autoload/agit/aligner.vim')
-    execute 'source ' . fnameescape(s:pluginPath . '/autoload/agit/git.vim')
+    if get(s:, 'firsttime', 1)
+        let s:firsttime = 0
+        call agit#aligner#align([], 80)
+        call agit#git#exec('status -s', getcwd())
+
+        execute 'source ' . fnameescape(s:pluginPath . '/autoload/agit/aligner.vim')
+        execute 'source ' . fnameescape(s:pluginPath . '/autoload/agit/git.vim')
+    endif
 endfunction
 call s:updateImpl()
 " ============================================================

@@ -9,7 +9,7 @@ syn region agitRef start="(" end=")" end="\.\.\." contained contains=@agitRefs n
 syn keyword agitHead HEAD contained
 syn match agitRemote /r:[^, :)]\+/ contained
 syn match agitTag /t:[^, :)]\+/ contained
-syn match agitDate /|>[a-zA-Z0-9, ]\+<|/ contained contains=agitDateMark
+syn match agitDate /|>[a-zA-Z0-9, \-:]\+<|/ contained contains=agitDateMark
 syn match agitAuthor /{>[^}]\+<}/ contained contains=agitAuthorMark
 syn match agitHash  /\[\x\{7,\}]/ contained
 
