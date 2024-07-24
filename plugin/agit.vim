@@ -113,10 +113,7 @@ endfunction
 function! AGIT_file_open()
     let tabCount = tabpagenr('$')
     let diffResult = ''
-    try
-        silent! execute "normal \<Plug>(agit-diff)"
-    catch
-    endtry
+    execute "normal \<Plug>(agit-diff)"
     if tabpagenr('$') <= tabCount
         call AGIT_unshallow()
         return
@@ -227,10 +224,7 @@ function! AGIT_stat_open()
 
     let wildignore = &wildignore
     set wildignore=
-    try
-        silent! call agit#diff#sidebyside(t:git, AGIT_stat_getCurFile(), '')
-    catch
-    endtry
+    call agit#diff#sidebyside(t:git, AGIT_stat_getCurFile(), '')
     let &wildignore = wildignore
     if tabpagenr('$') <= tabCount
         call AGIT_unshallow()
