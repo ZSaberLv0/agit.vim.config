@@ -1,5 +1,4 @@
 
-let g:zfzfzf=[]
 function! agit#git#exec(command, git_root, ...)
     let command = a:command
     if match(command, '--date') >= 0
@@ -9,7 +8,6 @@ function! agit#git#exec(command, git_root, ...)
         let command .= ' --date=format:"%Y-%m-%d %H:%M:%S" '
     endif
 
-    call add(g:zfzfzf, command)
     let cmd = 'cd "' . a:git_root . '" && ' . 'git --no-pager ' . command
     if a:0 > 0 && a:1 == 1
         execute '!' . cmd
