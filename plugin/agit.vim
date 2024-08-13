@@ -58,6 +58,7 @@ function! AGIT_fixEndl()
 endfunction
 
 function! AGIT_main(path)
+    let g:loaded_fugitive = 0
     call s:updateImpl()
     if isdirectory(a:path)
         let path = substitute(a:path, '\\', '/', 'g')
