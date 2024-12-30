@@ -17,7 +17,6 @@ function! s:updateImpl()
         execute 'source ' . fnameescape(s:pluginPath . '/autoload/agit/git.vim')
     endif
 endfunction
-call s:updateImpl()
 " ============================================================
 
 " option: {
